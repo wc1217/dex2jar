@@ -66,6 +66,9 @@ public class Dex2jarCmd extends BaseCmd {
     @Opt(opt = "nc", longOpt = "no-code", hasArg = false, description = "")
     private boolean noCode = false;
 
+    @Opt(longOpt = "skip-class", description = "skip-class")
+    private String skipClass = "";
+
     @Override
     protected void doCommandLine() throws Exception {
         if (remainingArgs.length == 0) {
@@ -109,7 +112,7 @@ public class Dex2jarCmd extends BaseCmd {
             BaksmaliBaseDexExceptionHandler handler = notHandleException ? null : new BaksmaliBaseDexExceptionHandler();
             Dex2jar.from(reader).withExceptionHandler(handler).reUseReg(reuseReg).topoLogicalSort()
                     .skipDebug(!debugInfo).optimizeSynchronized(this.optmizeSynchronized).printIR(printIR)
-                    .noCode(noCode).skipExceptions(skipExceptions).to(file);
+                    .noCode(noCode).skipExceptions(skipExceptions).skipClass(skipClass).to(file);
 
             if (!notHandleException) {
                 if (handler.hasException()) {

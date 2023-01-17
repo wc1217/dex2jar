@@ -75,6 +75,8 @@ public class Dex2jar {
     private int readerConfig;
     private int v3Config;
 
+    private String[] skipClass;
+
     private Dex2jar(BaseDexFileReader reader) {
         super();
         this.reader = reader;
@@ -99,6 +101,12 @@ public class Dex2jar {
                     public void visitEnd() {
                         super.visitEnd();
                         String className = rca.getClassName();
+                        if (skipClass != null)
+                            for (String skip : skipClass) {
+                                if (className.startsWith(skip)) {
+                                    return;
+                                }
+                            }
                         byte[] data;
                         try {
                             // FIXME handle 'java.lang.RuntimeException: Method code too large!'
@@ -316,6 +324,16 @@ public class Dex2jar {
             this.readerConfig |= DexFileReader.SKIP_EXCEPTION;
         } else {
             this.readerConfig &= ~DexFileReader.SKIP_EXCEPTION;
+        }
+        return this;
+    }
+
+    public Dex2jar skipClass(String skip_class) {
+        if (skip_class != null && !skip_class.trim().isEmpty()) {
+            this.skipClass = skip_class.trim().split("\\|");
+            for (int i = 0; i < this.skipClass.length; i++) {
+                this.skipClass[i] = this.skipClass[i].replace(".", "/");
+            }
         }
         return this;
     }
